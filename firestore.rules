@@ -1,0 +1,41 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // User Profiles
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Boards
+    match /boards/{boardId} {
+      allow create: if request.auth != null && request.resource.data.ownerId == request.auth.uid;
+      allow read: if request.auth != null && (
+        request.auth.uid == resource.data.ownerId || 
+        request.auth.uid in resource.data.memberIds
+      );
+      allow update: if request.auth != null && (
+        request.auth.uid == resource.data.ownerId || 
+        request.auth.uid in resource.data.memberIds
+      );
+      allow delete: if request.auth != null && request.auth.uid == resource.data.ownerId;
+      
+      // Columns subcollection
+      match /columns/{columnId} {
+        allow read, write: if request.auth != null && (
+          request.auth.uid in get(/databases/$(database)/documents/boards/$(boardId)).data.memberIds ||
+          request.auth.uid == get(/databases/$(database)/documents/boards/$(boardId)).data.ownerId
+        );
+        
+        // Cards subcollection
+        match /cards/{cardId} {
+          allow read, write: if request.auth != null && (
+            request.auth.uid in get(/databases/$(database)/documents/boards/$(boardId)).data.memberIds ||
+            request.auth.uid == get(/databases/$(database)/documents/boards/$(boardId)).data.ownerId
+          );
+        }
+      }
+    }
+  }
+}
