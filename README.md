@@ -16,6 +16,8 @@ Each board is designed like a digital garden: columns represent stages of progre
 - **Complete Auth System**: Secure Email/Password registration/login + Google Sign-In OAuth via Firebase Auth.
 - **SEO Ready**: Configured with Next.js Metadata API, sitemap, robots files, and dynamic OG Image generation. Private routes automatically declare `noindex` rules.
 - **Dark Mode Support**: Aesthetic dark theme that respects user preferences and saves choices in `localStorage`.
+- **Gardener Profile Settings & Presets**: Change display names and select custom or beautiful botanical avatar presets (Sunflower, Rose, Cactus, Sprout, Blossom) with a live preview.
+- **Resilient Avatars**: Automatic fallback to initials badge with deterministic garden-themed pastel background colors if profile pictures are missing or fail to load.
 - **Lightweight Notifications**: Beautiful, contextual alerts via `react-hot-toast` aligning with the garden motif.
 
 ---

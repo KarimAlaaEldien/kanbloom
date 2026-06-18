@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   description: "Watch your workflow bloom. Organize tasks, collaborate with your team in real time, and turn chaos into a beautiful, visual structure.",
   keywords: ["kanban", "trello alternative", "task board", "collaboration", "real-time database", "project management"],
   authors: [{ name: "Kanbloom Team" }],
-  metadataBase: new URL("https://kanbloom-three.vercel.app"), // Fallback domain for metadata
+  metadataBase: new URL("https://kanbloom.vercel.app"), // Fallback domain for metadata
   openGraph: {
     title: "Kanbloom - Real-Time Collaborative Task Board",
     description: "Watch your workflow bloom. Organize tasks, collaborate with your team in real time, and turn chaos into a beautiful, visual structure.",
