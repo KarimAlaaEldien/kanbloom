@@ -13,7 +13,8 @@ export default function SignupForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const router = useRouter();
 
   // Redirect if already logged in
@@ -33,7 +34,7 @@ export default function SignupForm() {
       toast.error("Password must be at least 6 characters long! 🔒");
       return;
     }
-    setLoading(true);
+    setEmailLoading(true);
     try {
       await signUpWithEmail(email, password, name);
       toast.success("Welcome, Gardener! Your account has taken root 🌱");
@@ -50,23 +51,31 @@ export default function SignupForm() {
       }
       toast.error(message);
     } finally {
-      setLoading(false);
+      setEmailLoading(false);
     }
   };
 
   const handleGoogleSignIn = async () => {
-    setLoading(true);
+    setGoogleLoading(true);
+    
+    // Safety timeout to reset loading state if popup gets stuck/blocked by browser
+    const timeoutId = setTimeout(() => {
+      setGoogleLoading(false);
+    }, 15000);
+
     try {
       await signInWithGoogle();
+      clearTimeout(timeoutId);
       toast.success("Signed in with Google! Time to grow 🌸");
       router.push("/dashboard");
     } catch (err: any) {
+      clearTimeout(timeoutId);
       console.error(err);
       if (err.code !== "auth/popup-closed-by-user") {
         toast.error("Google registration failed. Please try again.");
       }
     } finally {
-      setLoading(false);
+      setGoogleLoading(false);
     }
   };
 
@@ -133,10 +142,10 @@ export default function SignupForm() {
 
         <button
           type="submit"
-          disabled={loading || authLoading}
+          disabled={emailLoading || googleLoading || authLoading}
           className="w-full py-3.5 bg-bloom-green hover:bg-bloom-green-hover text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 text-sm flex items-center justify-center gap-1.5 disabled:opacity-50"
         >
-          {loading ? (
+          {emailLoading ? (
             <div className="w-5 h-5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
           ) : (
             <>
@@ -158,28 +167,34 @@ export default function SignupForm() {
       <button
         type="button"
         onClick={handleGoogleSignIn}
-        disabled={loading || authLoading}
+        disabled={emailLoading || googleLoading || authLoading}
         className="w-full py-3 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-700/50 text-text-primary dark:text-neutral-100 font-semibold rounded-xl shadow-sm transition-all duration-200 text-sm flex items-center justify-center gap-2 disabled:opacity-50"
       >
-        <svg className="w-4 h-4" viewBox="0 0 24 24">
-          <path
-            fill="#4285F4"
-            d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v3.92h6.69a5.74 5.74 0 0 1-2.5 3.77v3.13h4.04c2.37-2.18 3.73-5.39 3.73-9.15z"
-          />
-          <path
-            fill="#34A853"
-            d="M12 24c3.24 0 5.97-1.08 7.96-2.91l-4.04-3.13c-1.12.75-2.56 1.2-3.92 1.2-3.02 0-5.58-2.04-6.5-4.79H1.38v3.23C3.36 21.6 7.42 24 12 24z"
-          />
-          <path
-            fill="#FBBC05"
-            d="M5.5 14.37A7.17 7.17 0 0 1 5.1 12c0-.83.14-1.64.4-2.37V6.4H1.38A11.96 11.96 0 0 0 0 12c0 2.1.55 4.1 1.38 5.85l4.12-3.48z"
-          />
-          <path
-            fill="#EA4335"
-            d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.05 15.24 0 12 0 7.42 0 3.36 2.4 1.38 6.4l4.12 3.23c.92-2.75 3.48-4.88 6.5-4.88z"
-          />
-        </svg>
-        Google Account
+        {googleLoading ? (
+          <div className="w-5 h-5 rounded-full border-2 border-neutral-300 dark:border-neutral-600 border-t-bloom-green animate-spin" />
+        ) : (
+          <>
+            <svg className="w-4 h-4" viewBox="0 0 24 24">
+              <path
+                fill="#4285F4"
+                d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v3.92h6.69a5.74 5.74 0 0 1-2.5 3.77v3.13h4.04c2.37-2.18 3.73-5.39 3.73-9.15z"
+              />
+              <path
+                fill="#34A853"
+                d="M12 24c3.24 0 5.97-1.08 7.96-2.91l-4.04-3.13c-1.12.75-2.56 1.2-3.92 1.2-3.02 0-5.58-2.04-6.5-4.79H1.38v3.23C3.36 21.6 7.42 24 12 24z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M5.5 14.37A7.17 7.17 0 0 1 5.1 12c0-.83.14-1.64.4-2.37V6.4H1.38A11.96 11.96 0 0 0 0 12c0 2.1.55 4.1 1.38 5.85l4.12-3.48z"
+              />
+              <path
+                fill="#EA4335"
+                d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.05 15.24 0 12 0 7.42 0 3.36 2.4 1.38 6.4l4.12 3.23c.92-2.75 3.48-4.88 6.5-4.88z"
+              />
+            </svg>
+            Google Account
+          </>
+        )}
       </button>
 
       <p className="text-center text-xs text-text-secondary dark:text-neutral-400 mt-6">

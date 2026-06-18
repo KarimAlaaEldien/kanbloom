@@ -81,8 +81,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await syncUserProfile(firebaseUser, name);
       return firebaseUser;
     } catch (error) {
-      setLoading(false);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -96,8 +97,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await syncUserProfile(firebaseUser);
       return firebaseUser;
     } catch (error) {
-      setLoading(false);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -112,8 +114,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await syncUserProfile(firebaseUser);
       return firebaseUser;
     } catch (error) {
-      setLoading(false);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
