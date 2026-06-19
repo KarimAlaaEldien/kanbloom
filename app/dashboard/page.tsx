@@ -341,7 +341,7 @@ export default function DashboardPage() {
       <ConfirmModal
         isOpen={showDeleteConfirm && !!boardToDelete}
         title="Uproot Board?"
-        message={boardToDelete ? `Are you sure you want to delete "${boardToDelete.title}"? This will uproot all tasks! ⚠️` : ""}
+        message={boardToDelete ? `Are you sure you want to delete "${boardToDelete.title}"? This will uproot all tasks!` : ""}
         confirmText="Uproot"
         onConfirm={() => {
           if (boardToDelete) {

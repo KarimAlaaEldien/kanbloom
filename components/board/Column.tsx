@@ -157,7 +157,7 @@ export const Column: React.FC<ColumnProps> = ({
         <ConfirmModal
           isOpen={showDeleteConfirm}
           title="Uproot Column?"
-          message={`Are you sure you want to delete "${column.title}"? All cards inside will be lost! ⚠️`}
+          message={`Are you sure you want to delete "${column.title}"? All cards inside will be lost!`}
           confirmText="Uproot"
           onConfirm={() => {
             setShowDeleteConfirm(false);

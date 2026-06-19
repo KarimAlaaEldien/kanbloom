@@ -196,7 +196,7 @@ export const CardModal: React.FC<CardModalProps> = ({
         <ConfirmModal
           isOpen={showDeleteConfirm}
           title="Delete Card?"
-          message="Are you sure you want to delete this card? This action is permanent! ⚠️"
+          message="Are you sure you want to delete this card? This action is permanent!"
           confirmText="Delete"
           onConfirm={() => {
             setShowDeleteConfirm(false);
