@@ -260,7 +260,23 @@ export const BoardHeader: React.FC<BoardHeaderProps> = ({ board, boardId, isOwne
                     </p>
 
                     <div className="flex flex-col gap-2.5">
-                      {/* Send Email Invitation Button */}
+                      {/* Send via Gmail Button */}
+                      <a
+                        href={`https://mail.google.com/mail/?view=cm&fs=1&to=${lastInvitedEmail}&su=${encodeURIComponent("Join my Kanbloom board! 🌿")}&body=${encodeURIComponent(
+                          `Hi!\n\nI have invited you to collaborate on my task board "${board.title}" on Kanbloom.\n\nClick the link below to sign up and join the board automatically:\nhttps://kanbloom.vercel.app/signup?email=${lastInvitedEmail}\n\nHappy growing! 🌱`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-3 px-4 rounded-xl bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700/80 text-text-primary dark:text-neutral-200 text-xs font-semibold transition-all flex items-center justify-between group"
+                      >
+                        <span className="flex items-center gap-2">
+                          <Mail className="w-4 h-4 text-bloom-green" />
+                          Send via Gmail
+                        </span>
+                        <span className="text-[10px] text-text-secondary dark:text-neutral-500 font-normal">Opens Gmail web</span>
+                      </a>
+
+                      {/* Send via Mail App (Outlook, etc.) */}
                       <a
                         href={`mailto:${lastInvitedEmail}?subject=${encodeURIComponent("Join my Kanbloom board! 🌿")}&body=${encodeURIComponent(
                           `Hi!\n\nI have invited you to collaborate on my task board "${board.title}" on Kanbloom.\n\nClick the link below to sign up and join the board automatically:\nhttps://kanbloom.vercel.app/signup?email=${lastInvitedEmail}\n\nHappy growing! 🌱`
@@ -269,9 +285,9 @@ export const BoardHeader: React.FC<BoardHeaderProps> = ({ board, boardId, isOwne
                       >
                         <span className="flex items-center gap-2">
                           <Mail className="w-4 h-4 text-neutral-400 dark:text-neutral-500 group-hover:text-bloom-green transition-colors" />
-                          Send via Email
+                          Send via Mail App
                         </span>
-                        <span className="text-[10px] text-text-secondary dark:text-neutral-500 font-normal">Opens mail app</span>
+                        <span className="text-[10px] text-text-secondary dark:text-neutral-500 font-normal">Opens desktop app</span>
                       </a>
 
                       {/* Copy Share Link Button */}
