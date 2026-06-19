@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const profileData: UserProfile = {
       uid: firebaseUser.uid,
       displayName: customName || firebaseUser.displayName || firebaseUser.email?.split("@")[0] || "Gardener",
-      email: firebaseUser.email || "",
+      email: firebaseUser.email ? firebaseUser.email.toLowerCase() : "",
       photoURL: firebaseUser.photoURL || `https://api.dicebear.com/7.x/adventurer/svg?seed=${firebaseUser.uid}`,
     };
 
@@ -72,7 +72,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signUpWithEmail = async (email: string, password: string, name: string) => {
     setLoading(true);
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const cleanEmail = email.trim().toLowerCase();
+      const userCredential = await createUserWithEmailAndPassword(auth, cleanEmail, password);
       const firebaseUser = userCredential.user;
       
       // Update profile in Auth
@@ -91,7 +92,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logInWithEmail = async (email: string, password: string) => {
     setLoading(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const cleanEmail = email.trim().toLowerCase();
+      const userCredential = await signInWithEmailAndPassword(auth, cleanEmail, password);
       const firebaseUser = userCredential.user;
       
       // Sync profile
