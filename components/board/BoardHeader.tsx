@@ -5,7 +5,7 @@ import { Board, UserProfile } from "@/types";
 import { updateBoard, inviteUserByEmail } from "@/lib/firestore";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { Users, UserPlus, Edit2, Check, X, Calendar, Share2 } from "lucide-react";
+import { Users, UserPlus, Edit2, Check, X, Calendar, Share2, Mail, Copy } from "lucide-react";
 import toast from "react-hot-toast";
 import UserAvatar from "@/components/UserAvatar";
 
@@ -27,6 +27,9 @@ export const BoardHeader: React.FC<BoardHeaderProps> = ({ board, boardId, isOwne
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviting, setInviting] = useState(false);
+  const [inviteSuccess, setInviteSuccess] = useState(false);
+  const [isNewUser, setIsNewUser] = useState(false);
+  const [lastInvitedEmail, setLastInvitedEmail] = useState("");
 
   // Parse description and color
   const parseBoardData = (desc: string) => {
@@ -106,8 +109,9 @@ export const BoardHeader: React.FC<BoardHeaderProps> = ({ board, boardId, isOwne
       const res = await inviteUserByEmail(boardId, inviteEmail.trim());
       if (res.success) {
         toast.success(res.message);
-        setInviteEmail("");
-        setIsInviteOpen(false);
+        setLastInvitedEmail(inviteEmail.trim());
+        setIsNewUser(res.isNew || false);
+        setInviteSuccess(true);
       } else {
         toast.error(res.message);
       }
@@ -231,11 +235,15 @@ export const BoardHeader: React.FC<BoardHeaderProps> = ({ board, boardId, isOwne
               <div className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-bloom-green" />
                 <h3 className="font-heading text-lg font-bold text-text-primary dark:text-white">
-                  Add a Gardener
+                  {inviteSuccess ? "Invitation Planted! 🌱" : "Add a Gardener"}
                 </h3>
               </div>
               <button
-                onClick={() => setIsInviteOpen(false)}
+                onClick={() => {
+                  setIsInviteOpen(false);
+                  setInviteSuccess(false);
+                  setInviteEmail("");
+                }}
                 className="p-1.5 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-400 transition-all"
                 aria-label="Close invitation modal"
               >
@@ -243,52 +251,109 @@ export const BoardHeader: React.FC<BoardHeaderProps> = ({ board, boardId, isOwne
               </button>
             </div>
 
-            <p className="text-xs text-text-secondary dark:text-neutral-400 mb-4 leading-relaxed">
-              Invite a teammate to collaborate on this board. They must have a Kanbloom account. Once added, the board will show up on their dashboard instantly! 🌿
-            </p>
+            {inviteSuccess ? (
+              <div className="space-y-5">
+                {isNewUser ? (
+                  <>
+                    <p className="text-xs text-text-secondary dark:text-neutral-400 leading-relaxed">
+                      Since <span className="font-semibold text-bloom-green">{lastInvitedEmail}</span> is not registered on Kanbloom yet, we've created a pending invitation. Use one of the options below to invite them to join:
+                    </p>
 
-            <form onSubmit={handleInviteSubmit} className="space-y-4">
-              <div>
-                <label htmlFor="invite-email" className="block text-xs font-semibold uppercase tracking-wider text-text-secondary dark:text-neutral-400 mb-2">
-                  Teammate's Email Address
-                </label>
-                <input
-                  id="invite-email"
-                  type="email"
-                  placeholder="teammate@kanbloom.com"
-                  value={inviteEmail}
-                  onChange={(e) => setInviteEmail(e.target.value)}
-                  className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-bloom-green focus:border-transparent dark:text-white"
-                  required
-                />
-              </div>
+                    <div className="flex flex-col gap-2.5">
+                      {/* Send Email Invitation Button */}
+                      <a
+                        href={`mailto:${lastInvitedEmail}?subject=${encodeURIComponent("Join my Kanbloom board! 🌿")}&body=${encodeURIComponent(
+                          `Hi!\n\nI have invited you to collaborate on my task board "${board.title}" on Kanbloom.\n\nClick the link below to sign up and join the board automatically:\nhttps://kanbloom.vercel.app/signup?email=${lastInvitedEmail}\n\nHappy growing! 🌱`
+                        )}`}
+                        className="w-full py-3 px-4 rounded-xl bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700/80 text-text-primary dark:text-neutral-200 text-xs font-semibold transition-all flex items-center justify-between group"
+                      >
+                        <span className="flex items-center gap-2">
+                          <Mail className="w-4 h-4 text-neutral-400 dark:text-neutral-500 group-hover:text-bloom-green transition-colors" />
+                          Send via Email
+                        </span>
+                        <span className="text-[10px] text-text-secondary dark:text-neutral-500 font-normal">Opens mail app</span>
+                      </a>
 
-              <div className="flex gap-3 justify-end pt-4 border-t border-neutral-100 dark:border-neutral-800">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsInviteOpen(false);
-                    setInviteEmail("");
-                  }}
-                  className="px-4.5 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-xs font-semibold transition-all"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={inviting}
-                  className="px-5 py-2.5 rounded-xl bg-bloom-green hover:bg-bloom-green-hover text-white font-semibold text-xs shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 disabled:opacity-50"
-                >
-                  {inviting ? (
-                    <div className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                  ) : (
-                    <>
-                      Invite 🌸
-                    </>
-                  )}
-                </button>
+                      {/* Copy Share Link Button */}
+                      <button
+                        onClick={() => {
+                          const inviteLink = `https://kanbloom.vercel.app/signup?email=${lastInvitedEmail}`;
+                          navigator.clipboard.writeText(inviteLink);
+                          toast.success("Invitation link copied to clipboard! 📋");
+                        }}
+                        className="w-full py-3 px-4 rounded-xl bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700/80 text-text-primary dark:text-neutral-200 text-xs font-semibold transition-all flex items-center justify-between group"
+                      >
+                        <span className="flex items-center gap-2">
+                          <Copy className="w-4 h-4 text-neutral-400 dark:text-neutral-500 group-hover:text-bloom-green transition-colors" />
+                          Copy Invitation Link
+                        </span>
+                        <span className="text-[10px] text-text-secondary dark:text-neutral-500 font-normal">Share via WhatsApp / chat</span>
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-xs text-text-secondary dark:text-neutral-400 leading-relaxed">
+                    Successfully added <span className="font-semibold text-bloom-green">{lastInvitedEmail}</span> to this board! They can access it from their dashboard immediately. 🌸
+                  </p>
+                )}
+
+                <div className="flex justify-end pt-4 border-t border-neutral-100 dark:border-neutral-800">
+                  <button
+                    onClick={() => {
+                      setIsInviteOpen(false);
+                      setInviteSuccess(false);
+                      setInviteEmail("");
+                    }}
+                    className="px-6 py-2.5 rounded-xl bg-bloom-green hover:bg-bloom-green-hover text-white font-semibold text-xs shadow-md hover:shadow-lg transition-all"
+                  >
+                    Done
+                  </button>
+                </div>
               </div>
-            </form>
+            ) : (
+              <form onSubmit={handleInviteSubmit} className="space-y-4">
+                <div>
+                  <label htmlFor="invite-email" className="block text-xs font-semibold uppercase tracking-wider text-text-secondary dark:text-neutral-400 mb-2">
+                    Teammate's Email Address
+                  </label>
+                  <input
+                    id="invite-email"
+                    type="email"
+                    placeholder="teammate@kanbloom.com"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-bloom-green focus:border-transparent dark:text-white"
+                    required
+                  />
+                </div>
+
+                <div className="flex gap-3 justify-end pt-4 border-t border-neutral-100 dark:border-neutral-800">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsInviteOpen(false);
+                      setInviteEmail("");
+                    }}
+                    className="px-4.5 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-xs font-semibold transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={inviting}
+                    className="px-5 py-2.5 rounded-xl bg-bloom-green hover:bg-bloom-green-hover text-white font-semibold text-xs shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 disabled:opacity-50"
+                  >
+                    {inviting ? (
+                      <div className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                    ) : (
+                      <>
+                        Invite 🌸
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}

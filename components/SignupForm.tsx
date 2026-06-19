@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useAuth } from "@/lib/auth";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import Logo from "@/components/Logo";
 import { Lock, Mail, User, ArrowRight, ArrowLeft } from "lucide-react";
 
-export default function SignupForm() {
+function SignupFormContent() {
   const { signUpWithEmail, signInWithGoogle, user, loading: authLoading } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -16,6 +16,15 @@ export default function SignupForm() {
   const [emailLoading, setEmailLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Pre-fill email from query parameter (e.g. from invitation link)
+  useEffect(() => {
+    const emailParam = searchParams.get("email");
+    if (emailParam) {
+      setEmail(emailParam);
+    }
+  }, [searchParams]);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -218,3 +227,16 @@ export default function SignupForm() {
     </div>
   );
 }
+
+export default function SignupForm() {
+  return (
+    <Suspense fallback={
+      <div className="w-full max-w-md p-8 bg-white dark:bg-neutral-900 rounded-3xl shadow-xl border border-neutral-200/50 dark:border-neutral-800/80 flex items-center justify-center min-h-[300px]">
+        <div className="w-8 h-8 rounded-full border-4 border-bloom-green/30 border-t-bloom-green animate-spin" />
+      </div>
+    }>
+      <SignupFormContent />
+    </Suspense>
+  );
+}
+

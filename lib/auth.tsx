@@ -12,7 +12,7 @@ import {
   User as FirebaseUser,
   updateProfile,
 } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection, query, where, getDocs, updateDoc, arrayUnion, deleteDoc } from "firebase/firestore";
 import { auth, db } from "./firebase";
 import { UserProfile } from "../types";
 
@@ -37,15 +37,45 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Sync user profile to Firestore
   const syncUserProfile = async (firebaseUser: FirebaseUser, customName?: string) => {
     const userDocRef = doc(db, "users", firebaseUser.uid);
+    const userEmail = firebaseUser.email ? firebaseUser.email.toLowerCase() : "";
+    
     const profileData: UserProfile = {
       uid: firebaseUser.uid,
       displayName: customName || firebaseUser.displayName || firebaseUser.email?.split("@")[0] || "Gardener",
-      email: firebaseUser.email ? firebaseUser.email.toLowerCase() : "",
+      email: userEmail,
       photoURL: firebaseUser.photoURL || `https://api.dicebear.com/7.x/adventurer/svg?seed=${firebaseUser.uid}`,
     };
 
     await setDoc(userDocRef, profileData, { merge: true });
     setUserProfile(profileData);
+
+    // Process any pending invitations for this email
+    if (userEmail) {
+      try {
+        const invitesRef = collection(db, "pending_invitations");
+        const q = query(invitesRef, where("email", "==", userEmail));
+        const querySnapshot = await getDocs(q);
+        
+        if (!querySnapshot.empty) {
+          for (const inviteDoc of querySnapshot.docs) {
+            const inviteData = inviteDoc.data();
+            const boardId = inviteData.boardId;
+            
+            // Add user to board members
+            const boardRef = doc(db, "boards", boardId);
+            await updateDoc(boardRef, {
+              memberIds: arrayUnion(firebaseUser.uid)
+            });
+            
+            // Delete pending invitation
+            await deleteDoc(inviteDoc.ref);
+          }
+          console.log(`Processed ${querySnapshot.size} pending invitations for ${userEmail}`);
+        }
+      } catch (err) {
+        console.error("Error processing pending invitations on login:", err);
+      }
+    }
   };
 
   useEffect(() => {

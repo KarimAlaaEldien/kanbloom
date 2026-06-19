@@ -170,7 +170,7 @@ export const moveCardToColumn = async (
 // Collaboration Operations
 // ==========================================
 
-export const inviteUserByEmail = async (boardId: string, email: string): Promise<{ success: boolean; message: string }> => {
+export const inviteUserByEmail = async (boardId: string, email: string): Promise<{ success: boolean; message: string; isNew?: boolean }> => {
   try {
     const cleanEmail = email.trim().toLowerCase();
     
@@ -179,31 +179,52 @@ export const inviteUserByEmail = async (boardId: string, email: string): Promise
     const q = query(usersRef, where("email", "==", cleanEmail));
     const querySnapshot = await getDocs(q);
     
-    if (querySnapshot.empty) {
-      return { success: false, message: `No gardener found with email ${email}. Invite them to join Kanbloom! 🌱` };
+    // If the user already exists:
+    if (!querySnapshot.empty) {
+      const targetUserId = querySnapshot.docs[0].id;
+      
+      // Check if already in members
+      const boardRef = doc(db, "boards", boardId);
+      const boardSnap = await getDoc(boardRef);
+      
+      if (!boardSnap.exists()) {
+        return { success: false, message: "Board not found" };
+      }
+      
+      const boardData = boardSnap.data() as Board;
+      if (boardData.memberIds.includes(targetUserId)) {
+        return { success: true, isNew: false, message: `${email} is already working in this garden! 🌿` };
+      }
+      
+      // Add to members
+      await updateDoc(boardRef, {
+        memberIds: arrayUnion(targetUserId)
+      });
+      
+      return { success: true, isNew: false, message: `Successfully added ${email} to this board! 🌸` };
     }
     
-    const targetUserId = querySnapshot.docs[0].id;
+    // If the user does NOT exist yet, create a pending invitation
+    const invitesRef = collection(db, "pending_invitations");
+    const inviteQuery = query(invitesRef, where("boardId", "==", boardId), where("email", "==", cleanEmail));
+    const inviteSnap = await getDocs(inviteQuery);
     
-    // Check if already in members
-    const boardRef = doc(db, "boards", boardId);
-    const boardSnap = await getDoc(boardRef);
-    
-    if (!boardSnap.exists()) {
-      return { success: false, message: "Board not found" };
+    if (!inviteSnap.empty) {
+      return { success: true, isNew: true, message: `An invitation is already pending for ${email} on this board! 🌿` };
     }
     
-    const boardData = boardSnap.data() as Board;
-    if (boardData.memberIds.includes(targetUserId)) {
-      return { success: true, message: `${email} is already working in this garden! 🌿` };
-    }
-    
-    // Add to members
-    await updateDoc(boardRef, {
-      memberIds: arrayUnion(targetUserId)
+    // Create new pending invitation
+    await addDoc(invitesRef, {
+      boardId,
+      email: cleanEmail,
+      createdAt: serverTimestamp()
     });
     
-    return { success: true, message: `Successfully added ${email} to this board! 🌸` };
+    return { 
+      success: true, 
+      isNew: true,
+      message: `Invitation planted! Once ${email} registers, they will be added to the board automatically. 🌱` 
+    };
   } catch (error: any) {
     console.error("Invite error: ", error);
     return { success: false, message: error.message || "An error occurred while inviting." };
