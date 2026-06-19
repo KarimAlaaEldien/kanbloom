@@ -8,6 +8,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { Users, UserPlus, Edit2, Check, X, Calendar, Share2, Mail, Copy } from "lucide-react";
 import toast from "react-hot-toast";
 import UserAvatar from "@/components/UserAvatar";
+import { useAuth } from "@/lib/auth";
 
 interface BoardHeaderProps {
   board: Board;
@@ -16,6 +17,7 @@ interface BoardHeaderProps {
 }
 
 export const BoardHeader: React.FC<BoardHeaderProps> = ({ board, boardId, isOwner }) => {
+  const { user } = useAuth();
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState(board.title);
   
@@ -262,7 +264,7 @@ export const BoardHeader: React.FC<BoardHeaderProps> = ({ board, boardId, isOwne
                     <div className="flex flex-col gap-2.5">
                       {/* Send via Gmail Button */}
                       <a
-                        href={`https://mail.google.com/mail/?view=cm&fs=1&to=${lastInvitedEmail}&su=${encodeURIComponent("Join my Kanbloom board! 🌿")}&body=${encodeURIComponent(
+                        href={`https://mail.google.com/mail/?view=cm&fs=1&authuser=${encodeURIComponent(user?.email || "")}&to=${lastInvitedEmail}&su=${encodeURIComponent("Join my Kanbloom board! 🌿")}&body=${encodeURIComponent(
                           `Hi!\n\nI have invited you to collaborate on my task board "${board.title}" on Kanbloom.\n\nClick the link below to sign up and join the board automatically:\nhttps://kanbloom.vercel.app/signup?email=${lastInvitedEmail}\n\nHappy growing! 🌱`
                         )}`}
                         target="_blank"
