@@ -13,9 +13,10 @@ export default function LandingPage() {
       
       {/* Header / Navbar */}
       <header className="sticky top-0 z-40 w-full border-b border-neutral-200/50 bg-[#FAFAF9]/80 backdrop-blur-md dark:bg-bg-dark/80 dark:border-neutral-800/50">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/">
-            <Logo size="md" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <Link href="/" className="flex-shrink-0">
+            <Logo size="sm" className="sm:hidden" />
+            <Logo size="md" className="hidden sm:flex" />
           </Link>
           
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-text-secondary dark:text-neutral-300">
@@ -24,29 +25,29 @@ export default function LandingPage() {
             <a href="#garden-concept" className="hover:text-bloom-green transition-colors">The Garden Concept</a>
           </nav>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             {loading ? (
               <div className="w-8 h-8 rounded-full border-2 border-bloom-green/30 border-t-bloom-green animate-spin" />
             ) : user ? (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 sm:gap-4">
                 <Link
                   href="/dashboard"
-                  className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-bloom-green hover:bg-bloom-green-hover shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-1.5"
+                  className="px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-bloom-green hover:bg-bloom-green-hover shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap"
                 >
-                  Go to Dashboard <ArrowRight className="w-4 h-4" />
+                  Go to Dashboard <ArrowRight className="w-4 h-4 flex-shrink-0" />
                 </Link>
               </div>
             ) : (
               <>
                 <Link
                   href="/login"
-                  className="px-4 py-2 text-sm font-semibold text-text-primary dark:text-neutral-200 hover:text-bloom-green transition-colors"
+                  className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-text-primary dark:text-neutral-200 hover:text-bloom-green transition-colors whitespace-nowrap"
                 >
                   Log In
                 </Link>
                 <Link
                   href="/signup"
-                  className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-bloom-green hover:bg-bloom-green-hover shadow-md hover:shadow-lg transition-all duration-200"
+                  className="px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-bloom-green hover:bg-bloom-green-hover shadow-md hover:shadow-lg transition-all duration-200 whitespace-nowrap"
                 >
                   Start Growing
                 </Link>
@@ -57,12 +58,12 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-20 pb-16 md:pt-32 md:pb-24">
+      <section className="relative overflow-hidden pt-5 pb-16 md:pt-32 md:pb-24">
         {/* Background Decorative Blurs */}
         <div className="absolute top-1/4 left-1/10 w-72 h-72 rounded-full bg-bloom-green/10 blur-3xl -z-10 pointer-events-none" />
         <div className="absolute bottom-10 right-1/10 w-96 h-96 rounded-full bg-blossom-pink/10 blur-3xl -z-10 pointer-events-none" />
         
-        <div className="max-w-7xl mx-auto px-6 text-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-bloom-green/10 text-bloom-green-hover dark:text-bloom-green text-sm font-semibold mb-6">
             <Sprout className="w-4 h-4" />
             <span>Introducing Kanbloom</span>
@@ -105,8 +106,8 @@ export default function LandingPage() {
           </div>
 
           {/* Interactive UI Mockup Showcase */}
-          <div className="mt-16 md:mt-20 max-w-5xl mx-auto rounded-2xl p-3 bg-white dark:bg-neutral-800 shadow-2xl border border-neutral-200/60 dark:border-neutral-700/60">
-            <div className="rounded-xl overflow-hidden bg-neutral-50 dark:bg-neutral-900/40 p-6 flex flex-col gap-6 select-none border border-neutral-100 dark:border-neutral-800">
+          <div className="mt-16 md:mt-20 max-w-5xl mx-auto rounded-2xl p-2 sm:p-3 bg-white dark:bg-neutral-800 shadow-2xl border border-neutral-200/60 dark:border-neutral-700/60">
+            <div className="rounded-xl overflow-hidden bg-neutral-50 dark:bg-neutral-900/40 p-3 sm:p-6 flex flex-col gap-4 sm:gap-6 select-none border border-neutral-100 dark:border-neutral-800">
               {/* Fake Board Header */}
               <div className="flex items-center justify-between border-b border-neutral-200/50 dark:border-neutral-800/50 pb-4">
                 <div className="flex items-center gap-3">
@@ -123,7 +124,7 @@ export default function LandingPage() {
               </div>
 
               {/* Fake Columns */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 text-left">
                 {/* Column 1 */}
                 <div className="bg-neutral-100/70 dark:bg-neutral-900/60 rounded-2xl p-4 flex flex-col gap-3">
                   <div className="flex items-center justify-between font-heading font-semibold text-sm text-text-primary dark:text-neutral-200 px-1">
@@ -176,7 +177,7 @@ export default function LandingPage() {
 
       {/* Features Section */}
       <section id="features" className="py-20 bg-white dark:bg-neutral-900/30 border-t border-b border-neutral-200/50 dark:border-neutral-800/50">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto">
             <h2 className="font-heading text-3xl font-bold tracking-tight text-text-primary dark:text-white sm:text-4xl">
               Nurtured for real-time collaboration.
@@ -225,7 +226,7 @@ export default function LandingPage() {
 
       {/* How it Works Section */}
       <section id="how-it-works" className="py-20">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <h2 className="font-heading text-3xl font-bold tracking-tight text-text-primary dark:text-white sm:text-4xl">
               Plant, Grow, and Bloom
@@ -274,7 +275,7 @@ export default function LandingPage() {
 
       {/* Trust & Security Badge */}
       <section className="py-12 bg-neutral-100/50 dark:bg-neutral-800/20 border-t border-neutral-200/50 dark:border-neutral-800/30">
-        <div className="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-center gap-6 text-center sm:text-left">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-center gap-6 text-center sm:text-left">
           <div className="w-14 h-14 rounded-2xl bg-white dark:bg-neutral-800 shadow-md flex items-center justify-center text-bloom-green">
             <ShieldCheck className="w-8 h-8" />
           </div>
@@ -289,7 +290,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="mt-auto border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 py-12">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col items-center md:items-start gap-2">
             <Logo size="sm" />
             <p className="text-xs text-text-secondary dark:text-neutral-400 mt-1">
@@ -297,7 +298,7 @@ export default function LandingPage() {
             </p>
           </div>
           
-          <div className="flex items-center gap-6 text-xs text-text-secondary dark:text-neutral-400">
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-6 text-xs text-text-secondary dark:text-neutral-400 text-center">
             <span>&copy; {new Date().getFullYear()} Kanbloom. All rights reserved.</span>
             <span className="flex items-center gap-1">Made with <HeartPulse className="w-3.5 h-3.5 text-blossom-pink fill-blossom-pink" /> for productivity</span>
           </div>

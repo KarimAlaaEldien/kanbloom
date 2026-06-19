@@ -84,7 +84,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
     <div className="flex-1 flex flex-col min-h-screen bg-bg-light dark:bg-bg-dark text-text-primary dark:text-neutral-100 transition-colors duration-200">
       {/* Dashboard Navbar */}
       <header className="border-b border-neutral-200/50 dark:border-neutral-800/80 bg-white/70 backdrop-blur-md dark:bg-neutral-900/60 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <Link href="/dashboard">
               <Logo size="sm" />
@@ -140,7 +140,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
       </header>
 
       {/* Main dashboard space */}
-      <main className="flex-1 max-w-7xl mx-auto px-6 py-8 w-full flex flex-col">
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 py-8 w-full flex flex-col">
         {children}
       </main>
       {/* Profile Settings Modal */}

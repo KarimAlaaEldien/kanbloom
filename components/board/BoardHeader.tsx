@@ -128,7 +128,7 @@ export const BoardHeader: React.FC<BoardHeaderProps> = ({ board, boardId, isOwne
     : "Just now";
 
   return (
-    <div className="p-6 bg-white dark:bg-neutral-900 border-b border-neutral-200/50 dark:border-neutral-800/80 shrink-0 flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="p-4 sm:p-6 bg-white dark:bg-neutral-900 border-b border-neutral-200/50 dark:border-neutral-800/80 shrink-0 flex flex-col md:flex-row md:items-center justify-between gap-6">
       
       {/* Title & Info */}
       <div className="flex-1 flex flex-col gap-1.5 text-left">

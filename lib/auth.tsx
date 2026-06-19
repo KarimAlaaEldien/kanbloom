@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import {
   signInWithPopup,
+  signInWithRedirect,
   GoogleAuthProvider,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -107,16 +108,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(true);
     try {
       const provider = new GoogleAuthProvider();
+      
+      // Check if mobile or inside a webview using user agent only
+      const isMobile = typeof window !== "undefined" && 
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      if (isMobile) {
+        await signInWithRedirect(auth, provider);
+        // Returns a pending promise so the calling code doesn't proceed to success state
+        return new Promise<FirebaseUser>(() => {});
+      }
+      
       const userCredential = await signInWithPopup(auth, provider);
       const firebaseUser = userCredential.user;
       
       // Sync profile
       await syncUserProfile(firebaseUser);
-      return firebaseUser;
-    } catch (error) {
-      throw error;
-    } finally {
       setLoading(false);
+      return firebaseUser;
+    } catch (error: any) {
+      if (error.code === "auth/popup-blocked") {
+        console.warn("Popup blocked. Redirecting for Google Sign-In...");
+        const provider = new GoogleAuthProvider();
+        await signInWithRedirect(auth, provider);
+        // Returns a pending promise so the calling code doesn't proceed to success state
+        return new Promise<FirebaseUser>(() => {});
+      }
+      setLoading(false);
+      throw error;
     }
   };
 

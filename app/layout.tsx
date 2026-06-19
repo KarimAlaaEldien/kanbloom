@@ -59,11 +59,15 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      translate="no"
       className={`${poppins.variable} ${inter.variable} h-full scroll-smooth`}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
-      <body className="min-h-full font-body bg-bg-light dark:bg-bg-dark text-text-primary dark:text-neutral-100 flex flex-col antialiased">
+      <body
+        className="min-h-full font-body bg-bg-light dark:bg-bg-dark text-text-primary dark:text-neutral-100 flex flex-col antialiased"
+        suppressHydrationWarning
+      >
         <AuthProvider>
           <div className="flex-1 flex flex-col">
             {children}

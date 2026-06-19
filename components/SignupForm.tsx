@@ -70,9 +70,11 @@ export default function SignupForm() {
       router.push("/dashboard");
     } catch (err: any) {
       clearTimeout(timeoutId);
-      console.error(err);
       if (err.code !== "auth/popup-closed-by-user") {
+        console.error(err);
         toast.error("Google registration failed. Please try again.");
+      } else {
+        console.log("Google Sign-In popup closed by user.");
       }
     } finally {
       setGoogleLoading(false);
