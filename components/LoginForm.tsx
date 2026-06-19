@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import Logo from "@/components/Logo";
-import { Lock, Mail, ArrowRight } from "lucide-react";
+import { Lock, Mail, ArrowRight, ArrowLeft } from "lucide-react";
 
 export default function LoginForm() {
   const { logInWithEmail, signInWithGoogle, user, loading: authLoading } = useAuth();
@@ -78,6 +78,16 @@ export default function LoginForm() {
 
   return (
     <div className="w-full max-w-md p-8 bg-white dark:bg-neutral-900 rounded-3xl shadow-xl border border-neutral-200/50 dark:border-neutral-800/80 animate-pop-in">
+      <div className="mb-4">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-400 hover:text-bloom-green dark:hover:text-bloom-green transition-colors group"
+        >
+          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+          Back to home
+        </Link>
+      </div>
+
       <div className="flex flex-col items-center mb-8">
         <Link href="/">
           <Logo size="md" className="mb-4" />

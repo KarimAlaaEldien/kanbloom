@@ -5,6 +5,7 @@ import { Card } from "@/types";
 import { updateCard, deleteCard } from "@/lib/firestore";
 import { X, Trash2, Calendar, User, AlignLeft, MessageSquare, Layers, Save } from "lucide-react";
 import toast from "react-hot-toast";
+import ConfirmModal from "@/components/ConfirmModal";
 
 interface CardModalProps {
   card: Card;
@@ -25,6 +26,7 @@ export const CardModal: React.FC<CardModalProps> = ({
   const [description, setDescription] = useState(card.description);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -49,9 +51,6 @@ export const CardModal: React.FC<CardModalProps> = ({
   };
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this card? This action is permanent! ⚠️")) {
-      return;
-    }
 
     setDeleting(true);
     try {
@@ -159,7 +158,7 @@ export const CardModal: React.FC<CardModalProps> = ({
         <div className="p-6 bg-neutral-50 dark:bg-neutral-900/50 border-t border-neutral-100 dark:border-neutral-800/80 flex justify-between items-center shrink-0">
           <button
             type="button"
-            onClick={handleDelete}
+            onClick={() => setShowDeleteConfirm(true)}
             disabled={deleting || saving}
             className="flex items-center gap-1.5 px-4.5 py-2.5 rounded-xl border border-red-200 dark:border-red-950 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 text-xs font-semibold transition-all disabled:opacity-50"
           >
@@ -194,6 +193,17 @@ export const CardModal: React.FC<CardModalProps> = ({
           </div>
         </div>
 
+        <ConfirmModal
+          isOpen={showDeleteConfirm}
+          title="Delete Card?"
+          message="Are you sure you want to delete this card? This action is permanent! ⚠️"
+          confirmText="Delete"
+          onConfirm={() => {
+            setShowDeleteConfirm(false);
+            handleDelete();
+          }}
+          onCancel={() => setShowDeleteConfirm(false)}
+        />
       </div>
     </div>
   );

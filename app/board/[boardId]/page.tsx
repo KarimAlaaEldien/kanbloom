@@ -28,7 +28,7 @@ export default function BoardPage() {
   const params = useParams();
   const router = useRouter();
   const boardId = params.boardId as string;
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   // State
   const [board, setBoard] = useState<Board | null>(null);
@@ -60,7 +60,14 @@ export default function BoardPage() {
 
   // 1. Sync Board Info & Verify Access
   useEffect(() => {
-    if (!boardId || !user) return;
+    if (authLoading) return;
+
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+
+    if (!boardId) return;
 
     const boardRef = doc(db, "boards", boardId);
     const unsubscribe = onSnapshot(boardRef, (snap) => {
@@ -81,6 +88,7 @@ export default function BoardPage() {
       }
 
       setBoard({ id: snap.id, ...boardData } as Board);
+      setLoading(false);
     }, (error) => {
       console.error("Error loading board metadata:", error);
       setAccessDenied(true);
@@ -88,7 +96,7 @@ export default function BoardPage() {
     });
 
     return () => unsubscribe();
-  }, [boardId, user, router]);
+  }, [boardId, user, authLoading, router]);
 
   // 2. Sync Columns in Real Time
   useEffect(() => {
@@ -113,7 +121,6 @@ export default function BoardPage() {
   // 3. Sync Cards for each Column dynamically
   useEffect(() => {
     if (!boardId || columns.length === 0) {
-      setLoading(false);
       return;
     }
 
@@ -137,8 +144,6 @@ export default function BoardPage() {
 
       unsubscribes.push(unsub);
     });
-
-    setLoading(false);
 
     return () => {
       unsubscribes.forEach((unsub) => unsub());
@@ -300,7 +305,7 @@ export default function BoardPage() {
       .find((c) => c.id === activeCardId) || null;
   }, [activeCardId, cardsMap]);
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="flex-1 flex items-center justify-center h-full min-h-[400px]">
         <div className="w-10 h-10 rounded-full border-4 border-bloom-green/30 border-t-bloom-green animate-spin" />

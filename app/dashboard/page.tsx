@@ -9,6 +9,7 @@ import { Board } from "@/types";
 import { Plus, Users, Calendar, ArrowRight, Trash2, Sprout, ChevronRight, X } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import ConfirmModal from "@/components/ConfirmModal";
 
 const BOARD_COLORS = [
   { name: "Bloom Green 🌿", value: "bloom-green", hex: "#22C55E", bg: "bg-bloom-green" },
@@ -29,6 +30,10 @@ export default function DashboardPage() {
   const [description, setDescription] = useState("");
   const [selectedColor, setSelectedColor] = useState(BOARD_COLORS[0].value);
   const [submitting, setSubmitting] = useState(false);
+  
+  // Delete confirm state
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [boardToDelete, setBoardToDelete] = useState<{ id: string; title: string } | null>(null);
 
   // Sync boards list in real-time
   useEffect(() => {
@@ -97,14 +102,7 @@ export default function DashboardPage() {
     }
   };
 
-  const handleDeleteBoard = async (boardId: string, boardTitle: string, e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent navigating to board
-    e.stopPropagation();
-
-    if (!confirm(`Are you sure you want to delete "${boardTitle}"? This will uproot all tasks! ⚠️`)) {
-      return;
-    }
-
+  const handleDeleteBoard = async (boardId: string) => {
     try {
       await deleteBoard(boardId);
       toast.success("Board has been uprooted successfully.");
@@ -196,7 +194,12 @@ export default function DashboardPage() {
                   
                   {isOwner && (
                     <button
-                      onClick={(e) => handleDeleteBoard(board.id, board.title, e)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setBoardToDelete({ id: board.id, title: board.title });
+                        setShowDeleteConfirm(true);
+                      }}
                       className="p-1.5 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all opacity-0 group-hover:opacity-100 focus:opacity-100"
                       title="Uproot board"
                     >
@@ -297,7 +300,7 @@ export default function DashboardPage() {
                       onClick={() => setSelectedColor(color.value)}
                       className={`h-11 rounded-xl flex items-center justify-center text-[10px] font-bold text-white transition-all shadow-sm ${color.bg} ${
                         selectedColor === color.value
-                          ? "ring-4 ring-offset-2 ring-bloom-green dark:ring-offset-neutral-900 scale-105"
+                           ? "ring-4 ring-offset-2 ring-bloom-green dark:ring-offset-neutral-900 scale-105"
                           : "hover:scale-[1.03]"
                       }`}
                       title={color.name}
@@ -334,6 +337,24 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={showDeleteConfirm && !!boardToDelete}
+        title="Uproot Board?"
+        message={boardToDelete ? `Are you sure you want to delete "${boardToDelete.title}"? This will uproot all tasks! ⚠️` : ""}
+        confirmText="Uproot"
+        onConfirm={() => {
+          if (boardToDelete) {
+            handleDeleteBoard(boardToDelete.id);
+            setBoardToDelete(null);
+          }
+          setShowDeleteConfirm(false);
+        }}
+        onCancel={() => {
+          setShowDeleteConfirm(false);
+          setBoardToDelete(null);
+        }}
+      />
     </div>
   );
 }

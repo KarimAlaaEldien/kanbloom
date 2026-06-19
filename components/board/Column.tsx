@@ -8,6 +8,7 @@ import Card from "./Card";
 import { createCard, deleteColumn, updateColumn } from "@/lib/firestore";
 import { Plus, Trash2, X, PlusCircle, Sprout, Edit2, Check } from "lucide-react";
 import toast from "react-hot-toast";
+import ConfirmModal from "@/components/ConfirmModal";
 
 interface ColumnProps {
   column: ColumnType;
@@ -32,6 +33,7 @@ export const Column: React.FC<ColumnProps> = ({
   const [newCardTitle, setNewCardTitle] = useState("");
   const [newCardDesc, setNewCardDesc] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Column edit states
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -91,9 +93,6 @@ export const Column: React.FC<ColumnProps> = ({
   };
 
   const handleDeleteColumn = async () => {
-    if (!confirm(`Are you sure you want to delete "${column.title}"? All cards inside will be lost! ⚠️`)) {
-      return;
-    }
 
     try {
       await deleteColumn(boardId, column.id);
@@ -148,12 +147,24 @@ export const Column: React.FC<ColumnProps> = ({
         </div>
 
         <button
-          onClick={handleDeleteColumn}
+          onClick={() => setShowDeleteConfirm(true)}
           className="p-1.5 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all shrink-0"
           title="Uproot column"
         >
           <Trash2 className="w-4 h-4" />
         </button>
+
+        <ConfirmModal
+          isOpen={showDeleteConfirm}
+          title="Uproot Column?"
+          message={`Are you sure you want to delete "${column.title}"? All cards inside will be lost! ⚠️`}
+          confirmText="Uproot"
+          onConfirm={() => {
+            setShowDeleteConfirm(false);
+            handleDeleteColumn();
+          }}
+          onCancel={() => setShowDeleteConfirm(false)}
+        />
       </div>
 
       {/* Cards List container */}
